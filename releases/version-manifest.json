@@ -1,0 +1,58 @@
+{
+  "appId": "com.haqqallah.app",
+  "appName": "حق الله - Haqq Allah",
+  "latestVersion": "3.0.0",
+  "latestVersionCode": 30,
+  "minSupportedVersion": "2.7.0",
+  "minSupportedVersionCode": 27,
+  "mandatoryUpdate": false,
+  "releaseDate": "2026-11-12",
+  "apkFileName": "haqq-allah-v3.0.0-release.apk",
+  "apkDownloadUrl": "/api/download/apk",
+  "sha256": null,
+  "fileSizeBytes": 0,
+  "apkAvailable": false,
+  "buildType": "release",
+  "minAndroidVersion": "Android 8.0+ (API 26) · متوافق حتى Android 7.0 (API 24)",
+  "targetSdk": 34,
+  "releaseNotes": [
+    "بنية أندرويد متكاملة متوافقة مع Android Studio (Gradle 8.2 / AGP / Kotlin 1.9 / API 24–34)",
+    "نظام تحديثات مستمر عبر الإنترنت مع التحقق التلقائي من الإصدارات عند التشغيل وبشكل دوري",
+    "التحقق التشفيري من سلامة ملف APK باستخدام بصمة SHA-256 قبل إطلاق التثبيت الرسمي",
+    "دعم التحديثات الاختيارية والإجبارية مع الحفاظ التام على بيانات المستخدم وإعداداته دون حذف التطبيق",
+    "صفحة توزيع مخصصة لتنزيل التطبيق ومشاركة رابط التحميل مع الآخرين",
+    "دعم كامل لنظام Android 8+ بما في ذلك أذونات تثبيت الحزم، FileProvider، وأيقونات Adaptive Icons"
+  ],
+  "history": [
+    {
+      "version": "3.0.0",
+      "versionCode": 30,
+      "releaseDate": "2026-11-12",
+      "mandatory": false,
+      "notes": [
+        "إطلاق منظومة البناء والتوزيع والتحديث المستمر لأندرويد",
+        "التحقق من بصمة SHA-256 ودعم Android 8+ PackageInstaller",
+        "إضافة صفحة التنزيل والمشاركة المباشرة داخل التطبيق وعبر الرابط /download"
+      ]
+    },
+    {
+      "version": "2.8.0",
+      "versionCode": 28,
+      "releaseDate": "2026-09-18",
+      "mandatory": false,
+      "notes": [
+        "تحسين ودجت الشاشة الرئيسية ومزامنة العداد التنازلي",
+        "دعم شاشات Jetpack Compose وتنبيهات الأذان الدقيقة في الخلفية"
+      ]
+    },
+    {
+      "version": "2.7.0",
+      "versionCode": 27,
+      "releaseDate": "2026-07-05",
+      "mandatory": false,
+      "notes": [
+        "النسخة المرجعية الأساسية: مواقيت الصلاة الفلكية، المصحف الكامل، الأذكار، ومتابعة النجوم الست"
+      ]
+    }
+  ]
+}

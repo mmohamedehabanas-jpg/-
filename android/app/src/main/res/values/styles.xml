@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Base Application Theme -->
+    <style name="Theme.HaqqAllah" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/primary_emerald_card</item>
+        <item name="colorSecondary">@color/gold_accent</item>
+        <item name="android:statusBarColor">@color/primary_emerald_dark</item>
+        <item name="android:navigationBarColor">@color/primary_emerald_dark</item>
+        <item name="android:windowBackground">@color/primary_emerald_dark</item>
+    </style>
+
+    <!-- Splash Screen Theme compatible with Android 8+ through Android 14+ -->
+    <style name="Theme.HaqqAllah.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/primary_emerald_dark</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/splash_emblem</item>
+        <item name="postSplashScreenTheme">@style/Theme.HaqqAllah.Fullscreen</item>
+    </style>
+
+    <!-- Fullscreen Immersive Theme for Quran Reading & Lock Screen Display -->
+    <style name="Theme.HaqqAllah.Fullscreen" parent="Theme.HaqqAllah">
+        <item name="android:windowFullscreen">false</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowTranslucentStatus">false</item>
+        <item name="android:windowTranslucentNavigation">false</item>
+        <item name="android:windowShowWhenLocked">true</item>
+        <item name="android:windowTurnScreenOn">true</item>
+    </style>
+</resources>

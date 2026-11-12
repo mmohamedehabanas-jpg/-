@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">حق الله</string>
+    <string name="widget_title">حق الله - مواقيت الصلاة والأذكار</string>
+    <string name="athan_notification_title">حان الآن موعد الأذان</string>
+    <string name="athan_notification_desc">حي على الصلاة.. حي على الفلاح</string>
+    <string name="stop_athan">إيقاف الأذان</string>
+    <string name="snooze_athan">تأجيل مؤقت</string>
+    <string name="quran_reader">المصحف الشريف</string>
+    <string name="azkar_title">الأذكار والمسبحة</string>
+</resources>

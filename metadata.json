@@ -1,0 +1,10 @@
+{
+  "name": "حق الله - Haqq Allah",
+  "description": "تطبيق حق الله الشامل لمواقيت الصلاة، الأذكار والمسبحة، المصحف الشريف، متابعة الفروض والسنن، مع نظام بناء وتوزيع وتحديث مستمر لتطبيق الأندرويد",
+  "requestFramePermissions": [
+    "geolocation"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

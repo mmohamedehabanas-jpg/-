@@ -1,0 +1,20 @@
+node_modules/
+build/
+dist/
+coverage/
+.DS_Store
+*.log
+.env*
+!.env.example
+
+# Android Studio & Signing Secrets (NEVER commit private keys)
+android/.gradle/
+android/local.properties
+android/keystore.properties
+android/app/build/
+android/build/
+*.jks
+*.keystore
+*.p12
+release-output/
+releases/*.apk

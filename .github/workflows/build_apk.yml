@@ -1,0 +1,128 @@
+name: Build & Publish Haqq Allah Android APKs (v3.0.0)
+
+on:
+  push:
+    branches:
+      - main
+      - master
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      create_release:
+        description: 'إنشاء GitHub Release تلقائياً برابط تحميل APK مباشر'
+        required: false
+        default: 'true'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
+      release_tag:
+        description: 'وسم الإصدار (مثال: v3.0.0)'
+        required: false
+        default: 'v3.0.0'
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  build-android:
+    name: Build Debug & Signed Release APKs
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Read Version from android/version.properties
+        id: version
+        run: |
+          VERSION_NAME=$(grep '^VERSION_NAME=' android/version.properties | cut -d'=' -f2 | tr -d '\r\n')
+          VERSION_CODE=$(grep '^VERSION_CODE=' android/version.properties | cut -d'=' -f2 | tr -d '\r\n')
+          TAG="${{ github.ref_type == 'tag' && github.ref_name || inputs.release_tag || format('v{0}', '') }}"
+          if [ -z "$TAG" ] || [ "$TAG" = "v" ]; then
+            TAG="v${VERSION_NAME}"
+          fi
+          echo "version_name=${VERSION_NAME}" >> "$GITHUB_OUTPUT"
+          echo "version_code=${VERSION_CODE}" >> "$GITHUB_OUTPUT"
+          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Dependencies & Build Web App
+        run: |
+          npm ci
+          npm run build
+          npm run android:sync
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: 'gradle'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Configure Release Keystore (if Secrets present)
+        if: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' }}
+        run: |
+          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > android/release-keystore.jks
+          cat <<EOF > android/keystore.properties
+          storeFile=release-keystore.jks
+          storePassword=${{ secrets.KEYSTORE_PASSWORD }}
+          keyAlias=${{ secrets.KEY_ALIAS }}
+          keyPassword=${{ secrets.KEY_PASSWORD }}
+          EOF
+
+      - name: Generate Gradle Wrapper & Build Debug + Release APKs
+        working-directory: android
+        run: |
+          gradle wrapper --gradle-version 8.5
+          chmod +x ./gradlew
+          ./gradlew assembleDebug assembleRelease --no-daemon --stacktrace
+
+      - name: Package APKs, SHA-256 & GitHub Manifest
+        run: |
+          mkdir -p release-output
+          VNAME="${{ steps.version.outputs.version_name }}"
+          TAG="${{ steps.version.outputs.tag }}"
+          DEBUG_APK=$(find android/app/build/outputs/apk/debug -name "*.apk" | head -n 1)
+          RELEASE_APK=$(find android/app/build/outputs/apk/release -name "*.apk" | head -n 1)
+
+          if [ -n "$DEBUG_APK" ]; then
+            cp "$DEBUG_APK" "release-output/haqq-allah-v${VNAME}-debug.apk"
+          fi
+
+          if [ -n "$RELEASE_APK" ]; then
+            APK_URL="https://github.com/${{ github.repository }}/releases/download/${TAG}/haqq-allah-v${VNAME}-release.apk"
+            node scripts/publish-release.mjs --apk "$RELEASE_APK" --apk-url "$APK_URL"
+            cp releases/*.apk release-output/
+            cp releases/version-manifest.json release-output/
+          fi
+
+          (cd release-output && sha256sum *.apk > SHA256SUMS.txt)
+
+      - name: Upload Debug & Release APKs as Workflow Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: haqq-allah-v${{ steps.version.outputs.version_name }}-apks
+          path: release-output/*
+          retention-days: 30
+
+      - name: Create GitHub Release with Direct APK Download Links
+        if: startsWith(github.ref, 'refs/tags/v') || (github.event_name == 'workflow_dispatch' && inputs.create_release == 'true')
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          name: Haqq Allah v${{ steps.version.outputs.version_name }} (Android APK)
+          files: release-output/*
+          generate_release_notes: true
+          draft: false
+          prerelease: false

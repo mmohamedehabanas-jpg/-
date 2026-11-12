@@ -1,0 +1,169 @@
+plugins {
+    id 'com.android.application'
+    id 'kotlin-android'
+}
+
+def versionPropsFile = file('../version.properties')
+def versionProps = new Properties()
+if (versionPropsFile.exists()) {
+    versionProps.load(new FileInputStream(versionPropsFile))
+}
+def appVersionCode = (versionProps['VERSION_CODE'] ?: '30').toInteger()
+def appVersionName = (versionProps['VERSION_NAME'] ?: '3.0.0').toString()
+
+def keystorePropertiesFile = file('../keystore.properties')
+def keystoreProperties = new Properties()
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
+
+def releaseStoreFilePath = System.getenv("KEYSTORE_FILE") ?: keystoreProperties['storeFile']
+def releaseStoreFile = releaseStoreFilePath ? file(releaseStoreFilePath.startsWith('/') ? releaseStoreFilePath : "../${releaseStoreFilePath}") : file('release-keystore.jks')
+def hasReleaseKeystore = releaseStoreFile.exists()
+
+def updateManifestUrl = project.hasProperty('UPDATE_MANIFEST_URL')
+    ? project.property('UPDATE_MANIFEST_URL').toString()
+    : (System.getenv("UPDATE_MANIFEST_URL") ?: "https://ais-pre-ot3ltdxvy7sf4nuhohf3av-437982874364.europe-west2.run.app/api/version")
+
+android {
+    namespace "com.haqqallah.app"
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "com.haqqallah.app"
+        minSdk 24
+        targetSdk 34
+        versionCode appVersionCode
+        versionName appVersionName
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        vectorDrawables.useSupportLibrary = true
+        ndk {
+            abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86_64'
+        }
+
+        buildConfigField "String", "UPDATE_MANIFEST_URL", "\"${updateManifestUrl}\""
+        buildConfigField "String", "DISTRIBUTION_PAGE_URL", "\"https://ais-pre-ot3ltdxvy7sf4nuhohf3av-437982874364.europe-west2.run.app/download\""
+    }
+
+    signingConfigs {
+        release {
+            if (hasReleaseKeystore) {
+                storeFile releaseStoreFile
+                storePassword System.getenv("KEYSTORE_PASSWORD") ?: keystoreProperties['storePassword']
+                keyAlias System.getenv("KEY_ALIAS") ?: keystoreProperties['keyAlias']
+                keyPassword System.getenv("KEY_PASSWORD") ?: keystoreProperties['keyPassword']
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            if (hasReleaseKeystore) {
+                signingConfig signingConfigs.release
+            } else {
+                // Unsigned release if keystore.properties / KEYSTORE_FILE is not yet configured;
+                // configure keystore.properties before publishing to preserve upgrade certificate continuity.
+                signingConfig signingConfigs.debug
+            }
+        }
+        debug {
+            applicationIdSuffix ".debug"
+            versionNameSuffix "-debug"
+            debuggable true
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    kotlinOptions {
+        jvmTarget = '17'
+        freeCompilerArgs += [
+            "-opt-in=kotlin.RequiresOptIn"
+        ]
+    }
+
+    buildFeatures {
+        viewBinding true
+        compose true
+        buildConfig true
+    }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion "1.5.8"
+    }
+
+    packaging {
+        resources {
+            excludes += [
+                'META-INF/DEPENDENCIES',
+                'META-INF/LICENSE',
+                'META-INF/LICENSE.txt',
+                'META-INF/license.txt',
+                'META-INF/NOTICE',
+                'META-INF/NOTICE.txt',
+                'META-INF/notice.txt',
+                'META-INF/ASL2.0',
+                'META-INF/*.kotlin_module',
+                'META-INF/{AL2.0,LGPL2.1}'
+            ]
+        }
+        jniLibs {
+            pickFirsts += [
+                '**/libc++_shared.so',
+                '**/libfbjni.so'
+            ]
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    // Kotlin & Core Support
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    implementation 'androidx.core:core-ktx:1.12.0'
+    implementation 'androidx.core:core-splashscreen:1.0.1'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'androidx.webkit:webkit:1.10.0'
+    implementation 'com.google.android.material:material:1.11.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+
+    // Media3 / ExoPlayer & MediaSessionCompat for Background Playback
+    implementation 'androidx.media3:media3-exoplayer:1.2.1'
+    implementation 'androidx.media3:media3-session:1.2.1'
+    implementation 'androidx.media3:media3-ui:1.2.1'
+    implementation 'androidx.media3:media3-common:1.2.1'
+    implementation 'androidx.media:media:1.7.0'
+
+    // WorkManager for Resilient Background Scheduling
+    implementation 'androidx.work:work-runtime-ktx:2.9.0'
+
+    // Glance for Modern App Widgets
+    implementation 'androidx.glance:glance-appwidget:1.0.0'
+
+    // Coroutines & Lifecycle
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.7.0'
+    implementation 'androidx.lifecycle:lifecycle-service:2.7.0'
+
+    // Jetpack Compose Modern Reactive UI
+    implementation platform('androidx.compose:compose-bom:2024.02.00')
+    implementation 'androidx.compose.ui:ui'
+    implementation 'androidx.compose.ui:ui-graphics'
+    implementation 'androidx.compose.ui:ui-tooling-preview'
+    implementation 'androidx.compose.material3:material3'
+    implementation 'androidx.activity:activity-compose:1.8.2'
+
+    // Flutter Embedding Integration (optional compileOnly bridge)
+    compileOnly 'io.flutter:flutter_embedding_release:1.0.0-e672b006cb34c921db85b8e2f482ed3144a4574b'
+
+    // React Native Bridge & Engine (optional compileOnly bridge)
+    compileOnly 'com.facebook.react:react-android:0.73.4'
+}

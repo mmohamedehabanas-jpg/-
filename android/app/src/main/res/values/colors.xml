@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="primary_emerald_dark">#061914</color>
+    <color name="primary_emerald_card">#0C3127</color>
+    <color name="gold_accent">#FBBF24</color>
+    <color name="mint_accent">#6EE7B7</color>
+    <color name="oled_black">#000000</color>
+    <color name="sepia_bg">#FBF0D9</color>
+    <color name="sepia_text">#422006</color>
+    <color name="white">#FFFFFF</color>
+</resources>

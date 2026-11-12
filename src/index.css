@@ -1,0 +1,362 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --accent-color: #10b981;
+    --accent-hover: #059669;
+    --accent-text: #ffffff;
+    --accent-border: #10b981;
+    --accent-border-subtle: rgba(16, 185, 129, 0.3);
+    --accent-bg-subtle: rgba(16, 185, 129, 0.14);
+    --accent-glow: rgba(16, 185, 129, 0.45);
+    --accent-gradient: linear-gradient(135deg, #34d399 0%, #10b981 50%, #059669 100%);
+    --accent-metallic: linear-gradient(135deg, #a7f3d0 0%, #10b981 40%, #064e3b 100%);
+  }
+
+  /* 1. GOLD ACCENT (الذهب الملكي العتيق) */
+  [data-accent="gold"] {
+    --accent-color: #f59e0b;
+    --accent-hover: #d97706;
+    --accent-text: #000000;
+    --accent-border: #f59e0b;
+    --accent-border-subtle: rgba(245, 158, 11, 0.35);
+    --accent-bg-subtle: rgba(245, 158, 11, 0.16);
+    --accent-glow: rgba(245, 158, 11, 0.45);
+    --accent-gradient: linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #b45309 100%);
+    --accent-metallic: linear-gradient(135deg, #fef08a 0%, #f59e0b 45%, #92400e 100%);
+  }
+
+  /* 2. MINT/EMERALD ACCENT (الزمرد الإمبراطوري) */
+  [data-accent="mint"] {
+    --accent-color: #10b981;
+    --accent-hover: #059669;
+    --accent-text: #ffffff;
+    --accent-border: #10b981;
+    --accent-border-subtle: rgba(16, 185, 129, 0.35);
+    --accent-bg-subtle: rgba(16, 185, 129, 0.16);
+    --accent-glow: rgba(16, 185, 129, 0.45);
+    --accent-gradient: linear-gradient(135deg, #34d399 0%, #10b981 50%, #059669 100%);
+    --accent-metallic: linear-gradient(135deg, #a7f3d0 0%, #10b981 45%, #064e3b 100%);
+  }
+
+  /* 3. BLUE ACCENT (الياقوت الأزرق السماوي) */
+  [data-accent="blue"] {
+    --accent-color: #3b82f6;
+    --accent-hover: #2563eb;
+    --accent-text: #ffffff;
+    --accent-border: #3b82f6;
+    --accent-border-subtle: rgba(59, 130, 246, 0.35);
+    --accent-bg-subtle: rgba(59, 130, 246, 0.16);
+    --accent-glow: rgba(59, 130, 246, 0.45);
+    --accent-gradient: linear-gradient(135deg, #60a5fa 0%, #3b82f6 50%, #1d4ed8 100%);
+    --accent-metallic: linear-gradient(135deg, #bfdbfe 0%, #3b82f6 45%, #1e3a8a 100%);
+  }
+
+  /* 4. PURPLE ACCENT (الأرجوان والجمشت الملكي) */
+  [data-accent="purple"] {
+    --accent-color: #a855f7;
+    --accent-hover: #9333ea;
+    --accent-text: #ffffff;
+    --accent-border: #a855f7;
+    --accent-border-subtle: rgba(168, 85, 247, 0.35);
+    --accent-bg-subtle: rgba(168, 85, 247, 0.16);
+    --accent-glow: rgba(168, 85, 247, 0.45);
+    --accent-gradient: linear-gradient(135deg, #c084fc 0%, #a855f7 50%, #7e22ce 100%);
+    --accent-metallic: linear-gradient(135deg, #e9d5ff 0%, #a855f7 45%, #581c87 100%);
+  }
+
+  body {
+    font-family: 'Cairo', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    direction: rtl;
+    text-align: right;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    transition: background-color 0.4s cubic-bezier(0.16, 1, 0.3, 1), color 0.4s ease;
+  }
+
+  .font-serif {
+    font-family: 'Amiri', 'Scheherazade New', 'Traditional Arabic', serif;
+  }
+}
+
+/* Islamic Geometric Background Arabesque Pattern */
+.islamic-pattern-bg {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0L42.5 17.5L60 30L42.5 42.5L30 60L17.5 42.5L0 30L17.5 17.5L30 0Z' fill='none' stroke='rgba(255,255,255,0.025)' stroke-width='1'/%3E%3Ccircle cx='30' cy='30' r='10' fill='none' stroke='rgba(255,255,255,0.015)' stroke-width='1'/%3E%3C/svg%3E");
+  background-size: 20px 20px, 60px 60px;
+}
+
+.theme-light .islamic-pattern-bg {
+  background-image: radial-gradient(rgba(10, 40, 25, 0.04) 1px, transparent 1px),
+    url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0L42.5 17.5L60 30L42.5 42.5L30 60L17.5 42.5L0 30L17.5 17.5L30 0Z' fill='none' stroke='rgba(10,40,25,0.03)' stroke-width='1'/%3E%3Ccircle cx='30' cy='30' r='10' fill='none' stroke='rgba(10,40,25,0.02)' stroke-width='1'/%3E%3C/svg%3E");
+}
+
+/* ========================================================
+   UNIVERSAL ACCENT UTILITIES & METALLIC SHINE
+   ======================================================== */
+.app-accent-text {
+  color: var(--accent-color) !important;
+}
+
+.app-accent-bg {
+  background: var(--accent-gradient) !important;
+  color: var(--accent-text) !important;
+}
+
+.app-accent-metallic {
+  background: var(--accent-metallic) !important;
+  color: var(--accent-text) !important;
+}
+
+.app-accent-border {
+  border-color: var(--accent-border) !important;
+}
+
+.app-accent-glow {
+  box-shadow: 0 0 25px var(--accent-glow) !important;
+}
+
+.app-accent-ring {
+  box-shadow: 0 0 0 2px var(--accent-border), 0 0 20px var(--accent-glow) !important;
+}
+
+/* Shimmer metallic reflection */
+@keyframes metallicShimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.shimmer-badge {
+  background-size: 200% 100%;
+  animation: metallicShimmer 6s infinite linear;
+}
+
+/* ========================================================
+   THEME STYLES (OLED, EMERALD, GLASS, LIGHT)
+   ======================================================== */
+
+/* 1. Theme OLED (الملكي الفاحم العميق) */
+.theme-oled {
+  background-color: #000000 !important;
+  color: #f8fafc !important;
+}
+.theme-oled .theme-card,
+.theme-oled .bg-\[\#091f18\]\/90,
+.theme-oled .bg-\[\#0b241e\]\/90 {
+  background-color: #080a09 !important;
+  border-color: rgba(255, 255, 255, 0.11) !important;
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.9), inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+}
+.theme-oled nav.fixed {
+  background-color: rgba(6, 8, 7, 0.95) !important;
+  backdrop-filter: blur(24px) !important;
+  border-color: rgba(255, 255, 255, 0.14) !important;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.95) !important;
+}
+.theme-oled .bg-black\/40,
+.theme-oled .bg-black\/30,
+.theme-oled .bg-black\/20 {
+  background-color: #101412 !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+.theme-oled .bg-\[\#0c3127\] {
+  background: radial-gradient(circle at 50% 0%, #11261e 0%, #06110d 100%) !important;
+  border-color: rgba(255, 255, 255, 0.16) !important;
+}
+
+/* 2. Theme Emerald (الزمرد الإمبراطوري) */
+.theme-emerald {
+  background: radial-gradient(ellipse at 50% -20%, #072a1e 0%, #03140e 55%, #010805 100%) !important;
+  color: #f1f5f9 !important;
+}
+.theme-emerald .theme-card,
+.theme-emerald .bg-\[\#091f18\]\/90,
+.theme-emerald .bg-\[\#0b241e\]\/90 {
+  background-color: rgba(8, 28, 22, 0.92) !important;
+  border-color: rgba(16, 185, 129, 0.26) !important;
+  box-shadow: 0 12px 35px -8px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(52, 211, 153, 0.1) !important;
+}
+.theme-emerald nav.fixed {
+  background-color: rgba(6, 21, 16, 0.95) !important;
+  backdrop-filter: blur(24px) !important;
+  border-color: rgba(16, 185, 129, 0.35) !important;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.8), 0 0 25px rgba(16, 185, 129, 0.1) !important;
+}
+.theme-emerald .bg-\[\#0c3127\] {
+  background: linear-gradient(135deg, #0e3b2f 0%, #09261e 50%, #04140f 100%) !important;
+  border-color: rgba(16, 185, 129, 0.45) !important;
+}
+
+/* 3. Theme Glass (البلور الملكي المائي) */
+.theme-glass {
+  background: radial-gradient(circle at 50% -10%, #123d30 0%, #092019 45%, #030e0a 100%) !important;
+  color: #ffffff !important;
+}
+.theme-glass .theme-card,
+.theme-glass .bg-\[\#091f18\]\/90,
+.theme-glass .bg-\[\#0b241e\]\/90 {
+  background: rgba(14, 42, 33, 0.55) !important;
+  backdrop-filter: blur(24px) saturate(190%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(190%) !important;
+  border-color: rgba(255, 255, 255, 0.22) !important;
+  box-shadow: 0 14px 40px 0 rgba(0, 0, 0, 0.6), inset 0 1px 1px 0 rgba(255, 255, 255, 0.25) !important;
+}
+.theme-glass nav.fixed {
+  background: rgba(12, 36, 28, 0.75) !important;
+  backdrop-filter: blur(30px) saturate(200%) !important;
+  -webkit-backdrop-filter: blur(30px) saturate(200%) !important;
+  border-color: rgba(255, 255, 255, 0.25) !important;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), inset 0 1px 1px rgba(255, 255, 255, 0.3) !important;
+}
+.theme-glass .bg-\[\#0c3127\] {
+  background: rgba(16, 52, 41, 0.65) !important;
+  backdrop-filter: blur(28px) !important;
+  border-color: rgba(255, 255, 255, 0.28) !important;
+  box-shadow: 0 16px 45px rgba(0, 0, 0, 0.6), inset 0 1px 2px rgba(255, 255, 255, 0.25) !important;
+}
+
+/* 4. Theme Light (اللؤلؤي العاجي الفاخر - Ivory & Alabaster) */
+.theme-light {
+  background: #f8faf8 !important;
+  color: #0d2820 !important;
+}
+.theme-light .theme-card,
+.theme-light .bg-\[\#091f18\]\/90,
+.theme-light .bg-\[\#0b241e\]\/90 {
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  color: #0d2820 !important;
+  box-shadow: 0 6px 25px -4px rgba(10, 40, 30, 0.06), 0 2px 6px -2px rgba(10, 40, 30, 0.04) !important;
+}
+.theme-light .theme-card p,
+.theme-light .theme-card span,
+.theme-light p,
+.theme-light span {
+  color: inherit;
+}
+.theme-light h1,
+.theme-light h2,
+.theme-light h3,
+.theme-light h4,
+.theme-light .text-white {
+  color: #0b261d !important;
+}
+.theme-light .text-emerald-400\/60,
+.theme-light .text-emerald-300\/80,
+.theme-light .text-emerald-400,
+.theme-light .text-emerald-200,
+.theme-light .text-emerald-300 {
+  color: #475569 !important;
+}
+.theme-light .bg-black\/40,
+.theme-light .bg-black\/30,
+.theme-light .bg-black\/20 {
+  background-color: #f1f5f9 !important;
+  border-color: #e2e8f0 !important;
+  color: #1e293b !important;
+}
+.theme-light .bg-black\/40 span,
+.theme-light .bg-black\/30 span,
+.theme-light .bg-black\/20 span {
+  color: #1e293b !important;
+}
+.theme-light nav.fixed {
+  background-color: rgba(255, 255, 255, 0.96) !important;
+  backdrop-filter: blur(20px) !important;
+  border-color: #cbd5e1 !important;
+  box-shadow: 0 15px 35px -5px rgba(0, 0, 0, 0.1), 0 0 1px 1px rgba(0, 0, 0, 0.04) !important;
+}
+.theme-light nav.fixed button {
+  color: #64748b !important;
+}
+.theme-light nav.fixed button.app-accent-text,
+.theme-light nav.fixed button[class*="text-amber-400"] {
+  color: var(--accent-color) !important;
+}
+.theme-light .bg-\[\#122822\] {
+  background-color: #ffffff !important;
+  border-color: #cbd5e1 !important;
+  color: #0b261d !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
+}
+.theme-light .from-\[\#0c3127\] {
+  background: linear-gradient(135deg, #eef7f3 0%, #d8eee4 100%) !important;
+  border-color: #a7d9c6 !important;
+  color: #0b261d !important;
+  box-shadow: 0 10px 30px -5px rgba(16, 185, 129, 0.12) !important;
+}
+.theme-light .from-\[\#0c3127\] * {
+  color: #0b261d !important;
+}
+.theme-light .bg-\[\#164336\] {
+  background-color: #ffffff !important;
+  color: #0b261d !important;
+  border-color: #a7d9c6 !important;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Animations & Polished Micro-Interactions */
+@keyframes pulseSubtle {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.02);
+    opacity: 0.92;
+  }
+}
+
+@keyframes auraGlow {
+  0%, 100% {
+    box-shadow: 0 0 15px var(--accent-glow);
+  }
+  50% {
+    box-shadow: 0 0 30px var(--accent-glow), 0 0 10px var(--accent-color);
+  }
+}
+
+.animate-pulse-subtle {
+  animation: pulseSubtle 3s ease-in-out infinite;
+}
+
+.animate-aura {
+  animation: auraGlow 3.5s ease-in-out infinite;
+}
+
+@keyframes spinSlow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin-slow {
+  animation: spinSlow 24s linear infinite;
+}
+
+/* Custom subtle scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--accent-color);
+  opacity: 0.45;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-hover);
+}

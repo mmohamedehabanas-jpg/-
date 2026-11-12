@@ -1,0 +1,16 @@
+#!/usr/bin/env sh
+# Gradle Wrapper Launcher for Haqq Allah
+# Uses gradle-wrapper.jar if generated, or falls back to system gradle.
+
+APP_HOME="$(cd "$(dirname "$0")" && pwd)"
+WRAPPER_JAR="$APP_HOME/gradle/wrapper/gradle-wrapper.jar"
+
+if [ -f "$WRAPPER_JAR" ]; then
+    exec java -Xmx2048m -jar "$WRAPPER_JAR" "$@"
+elif command -v gradle >/dev/null 2>&1; then
+    exec gradle "$@"
+else
+    echo "Error: Neither gradle-wrapper.jar nor system 'gradle' was found."
+    echo "Open the 'android/' folder in Android Studio or run 'gradle wrapper' once."
+    exit 1
+fi

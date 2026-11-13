@@ -38,7 +38,6 @@ interface PrayerTimesScreenProps {
   onTriggerLockdown: (prayerName: PrayerName) => void;
   onDetectGps: () => void;
   isGpsLoading: boolean;
-  onOpenReleasesModal?: () => void;
 }
 
 export const PrayerTimesScreen: React.FC<PrayerTimesScreenProps> = ({
@@ -49,7 +48,6 @@ export const PrayerTimesScreen: React.FC<PrayerTimesScreenProps> = ({
   onTriggerLockdown,
   onDetectGps,
   isGpsLoading,
-  onOpenReleasesModal,
 }) => {
   const [showQibla, setShowQibla] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -130,8 +128,6 @@ export const PrayerTimesScreen: React.FC<PrayerTimesScreenProps> = ({
     <div className="space-y-4 pb-28 text-white select-none transition-all duration-300" dir="rtl">
       {/* 1. Header Bar: Location on left, App title on right */}
       <div className="flex items-center justify-between pt-1 pb-1">
-        {/* Location pill and Releases Hub button */}
-        <div className="flex items-center gap-2">
           <button
             onClick={() => onNavigateToTab('settings')}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#122822]/90 hover:bg-[#18342c] border text-emerald-200 text-xs font-bold transition-all shadow-sm active:scale-95"
@@ -140,17 +136,6 @@ export const PrayerTimesScreen: React.FC<PrayerTimesScreenProps> = ({
             <MapPin className="w-3.5 h-3.5" style={{ color: 'var(--accent-color)' }} />
             <span>{cityShortName}</span>
           </button>
-
-          {onOpenReleasesModal && (
-            <button
-              onClick={onOpenReleasesModal}
-              title="مركز تنزيل وتحديثات تطبيق حق الله للأندرويد"
-              className="min-h-[38px] flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-900/70 hover:bg-emerald-800/80 border border-amber-400/40 text-amber-200 text-xs font-bold transition-colors shadow-sm active:scale-95 whitespace-nowrap"
-            >
-              <span>تنزيل التطبيق</span>
-            </button>
-          )}
-        </div>
 
         {/* Title & Hijri Date */}
         <div className="text-right">

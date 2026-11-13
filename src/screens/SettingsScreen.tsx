@@ -13,25 +13,18 @@ import {
   FileAudio,
   Upload,
   RefreshCw,
-  Bell,
-  Download,
-  Share2,
-  CheckCircle2
+  Bell
 } from 'lucide-react';
 import { CityLocation, PrayerName, UserPreferences } from '../types';
 import { CALCULATION_METHODS, PREDEFINED_CITIES } from '../data/islamicData';
 import { audioService } from '../services/audioService';
 import { HomeWidgetCard } from '../components/HomeWidgetCard';
-import { getInstalledAppInfo, shareAppDownloadLink } from '../services/updateService';
-import { UpdateCheckResult } from '../types/update';
 
 interface SettingsScreenProps {
   preferences: UserPreferences;
   onUpdatePreferences: (prefs: UserPreferences) => void;
   onDetectGps: () => void;
   isGpsLoading: boolean;
-  onOpenReleasesModal?: () => void;
-  onCheckForUpdates?: () => Promise<UpdateCheckResult | null>;
 }
 
 export const SettingsScreen: React.FC<SettingsScreenProps> = ({
@@ -39,12 +32,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
   onUpdatePreferences,
   onDetectGps,
   isGpsLoading,
-  onOpenReleasesModal,
-  onCheckForUpdates,
 }) => {
-  const installedInfo = getInstalledAppInfo();
-  const [updateCheckStatus, setUpdateCheckStatus] = useState<string | null>(null);
-  const [isCheckingUpdate, setIsCheckingUpdate] = useState(false);
   // Manage which accordion sections are open - ALL closed by default
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({
     default_adhan: false,
@@ -219,73 +207,6 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
         onChange={handlePrayerCustomFileUpload}
         className="hidden"
       />
-
-      {/* 1.5 Official Releases, Update Check & APK Distribution Hub Card */}
-      <div className="p-4 rounded-3xl bg-gradient-to-br from-emerald-950/80 via-[#0a231b] to-teal-950/90 border border-emerald-400/40 shadow-xl space-y-3">
-        <div className="flex items-center justify-between gap-2">
-          <div className="font-serif font-bold text-sm text-white">
-            التوزيع والتحديثات المستمرة
-          </div>
-          <span className="text-xs text-amber-300 font-mono tabular-nums">
-            v{installedInfo.versionName} · Code {installedInfo.versionCode}
-          </span>
-        </div>
-
-        <p className="text-xs text-emerald-200/80 leading-relaxed text-right">
-          تحقق من توفر إصدارات أندرويد جديدة، حمّل حزمة APK مع فحص SHA-256، أو شارك صفحة تنزيل التطبيق مع الآخرين.
-        </p>
-
-        {updateCheckStatus && (
-          <div className="p-2.5 rounded-xl bg-black/40 border border-emerald-500/25 text-xs text-emerald-200 flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-            <span>{updateCheckStatus}</span>
-          </div>
-        )}
-
-        {/* Action Buttons */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1">
-          <button
-            onClick={onOpenReleasesModal}
-            className="min-h-[44px] py-2.5 px-3 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-md active:scale-95 transition-all"
-          >
-            <Download className="w-4 h-4 shrink-0" />
-            <span>صفحة التنزيل والـ APK</span>
-          </button>
-
-          <button
-            onClick={async () => {
-              if (!onCheckForUpdates) return;
-              setIsCheckingUpdate(true);
-              setUpdateCheckStatus(null);
-              const res = await onCheckForUpdates();
-              setIsCheckingUpdate(false);
-              if (res && !res.updateAvailable) {
-                setUpdateCheckStatus(`أنت تستخدم أحدث إصدار منشور (v${res.latestVersion})`);
-              } else if (!res) {
-                setUpdateCheckStatus('تعذر الاتصال بخادم التحديثات حالياً.');
-              }
-            }}
-            disabled={isCheckingUpdate}
-            className="min-h-[44px] py-2.5 px-3 rounded-2xl bg-white/10 hover:bg-white/15 border border-white/20 text-white font-bold text-xs flex items-center justify-center gap-1.5 active:scale-95 transition-all"
-          >
-            <RefreshCw className={`w-4 h-4 shrink-0 ${isCheckingUpdate ? 'animate-spin' : ''}`} />
-            <span>فحص التحديثات</span>
-          </button>
-
-          <button
-            onClick={async () => {
-              const status = await shareAppDownloadLink(installedInfo.versionName);
-              if (status === 'copied') {
-                setUpdateCheckStatus('تم نسخ رابط صفحة التنزيل للمشاركة');
-              }
-            }}
-            className="min-h-[44px] py-2.5 px-3 rounded-2xl bg-white/10 hover:bg-white/15 border border-white/20 text-amber-200 font-bold text-xs flex items-center justify-center gap-1.5 active:scale-95 transition-all"
-          >
-            <Share2 className="w-4 h-4 shrink-0" />
-            <span>مشاركة رابط التنزيل</span>
-          </button>
-        </div>
-      </div>
 
       <div className="space-y-3">
         {/* CARD 1: صوت الأذان الافتراضي العام 🎙️ */}

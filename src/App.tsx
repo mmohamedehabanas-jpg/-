@@ -30,18 +30,9 @@ import { AzkarScreen } from './screens/AzkarScreen';
 import { QuranReaderScreen } from './screens/QuranReaderScreen';
 import { SettingsScreen } from './screens/SettingsScreen';
 import { LockScreenModal } from './components/LockScreenModal';
-import { ReleasesDownloadModal } from './components/ReleasesDownloadModal';
-import { UpdateNotificationModal } from './components/UpdateNotificationModal';
-import { DownloadDistributionPage } from './components/DownloadDistributionPage';
 import { PREDEFINED_CITIES } from './data/islamicData';
 import { calculatePrayerTimes } from './services/prayerCalculator';
 import { audioService } from './services/audioService';
-import {
-  checkForAppUpdates,
-  getLastUpdateCheckTimestamp,
-  isOptionalUpdateDismissed,
-} from './services/updateService';
-import { UpdateCheckResult } from './types/update';
 
 export default function App() {
   const [preferences, setPreferences] = useState<UserPreferences>(() => loadUserPreferences());
@@ -51,16 +42,6 @@ export default function App() {
   const [azkarItems, setAzkarItems] = useState<ZikrItem[]>(() => loadAzkarItems());
   const [selectedAzkarCat, setSelectedAzkarCat] = useState<string>('morning');
   const [isGpsLoading, setIsGpsLoading] = useState<boolean>(false);
-  const [isReleasesModalOpen, setIsReleasesModalOpen] = useState<boolean>(false);
-  const [isStandaloneDownloadView, setIsStandaloneDownloadView] = useState<boolean>(() => {
-    if (typeof window === 'undefined') return false;
-    return (
-      window.location.pathname === '/download' ||
-      new URLSearchParams(window.location.search).get('view') === 'download'
-    );
-  });
-  const [availableUpdate, setAvailableUpdate] = useState<UpdateCheckResult | null>(null);
-  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState<boolean>(false);
 
   // Lockdown modal state
   const [isLockdownActive, setIsLockdownActive] = useState<boolean>(false);
@@ -252,74 +233,6 @@ export default function App() {
     return () => clearInterval(interval);
   }, [preferences]);
 
-  // Continuous Update System: check on launch, periodically every 6h, and on foreground resume
-  const runUpdateCheck = useCallback(async (manual = false) => {
-    try {
-      const result = await checkForAppUpdates();
-      if (result.updateAvailable) {
-        setAvailableUpdate(result);
-        if (manual || result.mandatoryUpdate || !isOptionalUpdateDismissed(result.latestVersionCode)) {
-          setIsUpdateModalOpen(true);
-        }
-      } else if (manual) {
-        setAvailableUpdate(result);
-      }
-      return result;
-    } catch (err) {
-      console.warn('Update check failed:', err);
-      return null;
-    }
-  }, []);
-
-  useEffect(() => {
-    const startupTimer = setTimeout(() => {
-      void runUpdateCheck(false);
-    }, 1200);
-
-    const periodicTimer = setInterval(() => {
-      void runUpdateCheck(false);
-    }, 6 * 60 * 60 * 1000);
-
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === 'visible') {
-        const elapsed = Date.now() - getLastUpdateCheckTimestamp();
-        if (elapsed > 60 * 60 * 1000) {
-          void runUpdateCheck(false);
-        }
-      }
-    };
-
-    const handleOpenDownloadEvent = () => {
-      setIsStandaloneDownloadView(true);
-    };
-
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    window.addEventListener('haqqallah:open-download', handleOpenDownloadEvent);
-
-    return () => {
-      clearTimeout(startupTimer);
-      clearInterval(periodicTimer);
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-      window.removeEventListener('haqqallah:open-download', handleOpenDownloadEvent);
-    };
-  }, [runUpdateCheck]);
-
-  const openDownloadPage = () => {
-    setIsReleasesModalOpen(false);
-    setIsUpdateModalOpen(false);
-    setIsStandaloneDownloadView(true);
-    if (typeof window !== 'undefined' && window.location.pathname !== '/download') {
-      window.history.pushState({}, '', '/download');
-    }
-  };
-
-  const closeDownloadPage = () => {
-    setIsStandaloneDownloadView(false);
-    if (typeof window !== 'undefined' && window.location.pathname === '/download') {
-      window.history.pushState({}, '', '/');
-    }
-  };
-
   // Determine active theme class - preserves full theme preset richness
   const getEffectiveThemeClass = () => {
     if (preferences.themeMode === 'light' || preferences.themePreset === 'light') return 'theme-light';
@@ -339,73 +252,58 @@ export default function App() {
       <div className="max-w-md mx-auto px-4 pt-3 pb-8 min-h-screen flex flex-col justify-between">
         {/* Dynamic Screen View */}
         <main className="flex-1">
-          {isStandaloneDownloadView ? (
-            <DownloadDistributionPage
-              onBackToApp={closeDownloadPage}
-              onOpenUpdateModal={(res) => {
-                setAvailableUpdate(res);
-                setIsUpdateModalOpen(true);
-              }}
+          {currentTab === 'prayers' && (
+            <PrayerTimesScreen
+              preferences={preferences}
+              dailyRecord={dailyRecord}
+              onUpdateDailyRecord={handleUpdateDailyRecord}
+              onNavigateToTab={setCurrentTab}
+              onTriggerLockdown={triggerLockdown}
+              onDetectGps={handleDetectGps}
+              isGpsLoading={isGpsLoading}
             />
-          ) : (
-            <>
-              {currentTab === 'prayers' && (
-                <PrayerTimesScreen
-                  preferences={preferences}
-                  dailyRecord={dailyRecord}
-                  onUpdateDailyRecord={handleUpdateDailyRecord}
-                  onNavigateToTab={setCurrentTab}
-                  onTriggerLockdown={triggerLockdown}
-                  onDetectGps={handleDetectGps}
-                  isGpsLoading={isGpsLoading}
-                  onOpenReleasesModal={() => setIsReleasesModalOpen(true)}
-                />
-              )}
+          )}
 
-              {currentTab === 'tracker' && (
-                <TrackerScreen
-                  currentRecord={dailyRecord}
-                  onUpdateRecord={handleUpdateDailyRecord}
-                  selectedDateStr={selectedDateStr}
-                  onChangeDate={handleChangeDate}
-                />
-              )}
+          {currentTab === 'tracker' && (
+            <TrackerScreen
+              currentRecord={dailyRecord}
+              onUpdateRecord={handleUpdateDailyRecord}
+              selectedDateStr={selectedDateStr}
+              onChangeDate={handleChangeDate}
+            />
+          )}
 
-              {currentTab === 'azkar' && (
-                <AzkarScreen
-                  azkarItems={azkarItems}
-                  onUpdateAzkarItems={handleUpdateAzkarItems}
-                  selectedCategory={selectedAzkarCat}
-                  onSelectCategory={setSelectedAzkarCat}
-                  preferences={preferences}
-                  onUpdatePreferences={handleUpdatePreferences}
-                />
-              )}
+          {currentTab === 'azkar' && (
+            <AzkarScreen
+              azkarItems={azkarItems}
+              onUpdateAzkarItems={handleUpdateAzkarItems}
+              selectedCategory={selectedAzkarCat}
+              onSelectCategory={setSelectedAzkarCat}
+              preferences={preferences}
+              onUpdatePreferences={handleUpdatePreferences}
+            />
+          )}
 
-              {currentTab === 'quran' && (
-                <QuranReaderScreen
-                  preferences={preferences}
-                  onUpdatePreferences={handleUpdatePreferences}
-                  onBackToPrayers={() => setCurrentTab('prayers')}
-                />
-              )}
+          {currentTab === 'quran' && (
+            <QuranReaderScreen
+              preferences={preferences}
+              onUpdatePreferences={handleUpdatePreferences}
+              onBackToPrayers={() => setCurrentTab('prayers')}
+            />
+          )}
 
-              {currentTab === 'settings' && (
-                <SettingsScreen
-                  preferences={preferences}
-                  onUpdatePreferences={handleUpdatePreferences}
-                  onDetectGps={handleDetectGps}
-                  isGpsLoading={isGpsLoading}
-                  onOpenReleasesModal={openDownloadPage}
-                  onCheckForUpdates={() => runUpdateCheck(true)}
-                />
-              )}
-            </>
+          {currentTab === 'settings' && (
+            <SettingsScreen
+              preferences={preferences}
+              onUpdatePreferences={handleUpdatePreferences}
+              onDetectGps={handleDetectGps}
+              isGpsLoading={isGpsLoading}
+            />
           )}
         </main>
 
-        {/* Bottom Floating Navigation Dock (Hidden in Quran Reader and Standalone Download View) */}
-        {currentTab !== 'quran' && !isStandaloneDownloadView && (
+        {/* Bottom Floating Navigation Dock (Hidden in Quran Reader) */}
+        {currentTab !== 'quran' && (
           <nav className="fixed bottom-2 left-3 right-3 max-w-md mx-auto z-40 backdrop-blur-2xl border rounded-3xl p-1.5 shadow-2xl flex items-center justify-around transition-all">
             {[
               { id: 'prayers' as const, label: 'المواقيت', icon: Clock },
@@ -461,24 +359,6 @@ export default function App() {
           onOpenAfterPrayerAzkar={handleOpenAfterPrayerAzkar}
         />
       )}
-
-      {/* Official Releases & APK Download Hub Modal */}
-      <ReleasesDownloadModal
-        isOpen={isReleasesModalOpen}
-        onClose={() => setIsReleasesModalOpen(false)}
-        onOpenUpdateModal={(res) => {
-          setAvailableUpdate(res);
-          setIsUpdateModalOpen(true);
-        }}
-      />
-
-      {/* Automatic & Manual Update Notification Modal */}
-      <UpdateNotificationModal
-        isOpen={isUpdateModalOpen}
-        updateResult={availableUpdate}
-        onClose={() => setIsUpdateModalOpen(false)}
-        onOpenDownloadPage={openDownloadPage}
-      />
     </div>
   );
 }
